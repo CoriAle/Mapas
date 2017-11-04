@@ -1,3 +1,80 @@
-<h1>
-  {{title}}
-</h1>
+<app-navbar></app-navbar>
+
+<h1>{{ title }}</h1>
+
+<div class="container main-container">
+	<div class="row">
+		<div class="col-md-4">
+			<div *ngIf="!marcadorSel" class="animated fadeIn fast">
+				<div class="alert alert-info" role="alert">
+					<strong>Haga click</strong>
+					en el mapa, para crear un marcador o seleccione uno.
+				</div>
+			</div>
+			<div *ngIf="marcadorSel" class="animated fadeIn fast">
+				<h5>Marcador</h5>
+				<hr>
+				<div class="form-group">
+					<label>Título</label>
+					<input 
+					type="text" 
+					name="titulo" 
+					[(ngModel)]="marcadorSel.titulo"
+					class="form-control">
+				</div>
+				<div class="form-group">
+					<label>Descripción</label>
+					<textarea
+					type="text" 
+					class = "form-control"
+					rows = "5"
+					name="desc" 
+					[(ngModel)]="marcadorSel.desc">
+					</textarea>
+				</div>
+				<div class="form-group">
+					<label>¿Se puede mover?</label>
+					<select [(ngModel)]="draggable"
+							name="draggable" 
+						class="form-control"
+						(change)="cambiarDraggable()">
+							<option value="1">Sí</option>
+							<option value="0">No</option>
+					</select>
+				</div>
+				<button (click)="_ms.guardarMarcadores()"
+					type="button" class="btn btn-outline-primary btn-block">
+				Guardar Cambios
+				</button>
+			</div>
+
+		</div>
+		<div class="col-md-8 animated fadeIn fast">
+			<agm-map 
+				[latitude]="lat" 
+				[longitude]="lng"
+				[zoom]="zoom"
+				(mapClick)="clickMapa($event)">
+			  <agm-marker  *ngFor="let marcador of _ms.marcadores; let i = index"
+				  [latitude]="marcador.lat" 
+				  [longitude]="marcador.lng"
+				  [title]="marcador.titulo"
+				  [markerDraggable] = "marcador.draggable"
+				  (markerClick)="clickMarcador(marcador, i)"
+				  (dragEnd)="dragEndMarcador(marcador, $event)">
+			 	<agm-info-window>     
+			 	 	<strong>{{marcador.titulo}}</strong>
+			 	 	<p *ngIf="marcador.desc">{{marcador.desc}} :)</p>
+			 	 	<p>
+			 	 		<a (click)="borrarMarcador(i)" class="text-danger puntero">Borrar marcador</a>
+			 	 	</p>
+			    </agm-info-window>
+			  </agm-marker>
+			</agm-map>
+		
+	</div>	
+	</div>
+	
+</div>
+<!-- this creates a google map on the page with the given lat/lng from -->
+<!-- the component as the initial center of the map: -->
